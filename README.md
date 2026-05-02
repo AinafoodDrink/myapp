@@ -1,16 +1,14 @@
-# myapp
+# GlowUp Daily - Skincare Assistant
 
-A new Flutter project.
+Aplikasi mobile berbasis Flutter yang dirancang untuk membantu pengguna mengelola rutinitas perawatan kulit secara konsisten dan terorganisir.
 
-## Getting Started
+## Daftar Fitur Aplikasi
+1. **Halaman Utama (Welcome Screen)**: Tampilan estetik dengan tema warna pink pastel dan tombol interaktif.
+2. **Pelacak Rutinitas Harian**: Fitur untuk mencatat rutinitas skincare pagi (Morning) dan malam (Night).
+3. **Manajemen Produk (Inventory)**: Mencatat koleksi skincare dan pengingat tanggal kadaluarsa.
+4. **Jurnal Kondisi Kulit**: Fitur dokumentasi perubahan kulit pengguna secara berkala.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Dokumentasi Pengembangan
+- **Framework**: Flutter & Dart
+- **Version Control**: Git & GitHub
+- **Status**: Pengembangan Tahap UI Halaman Utama
