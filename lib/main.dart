@@ -50,7 +50,13 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () {
-                  // Nanti kita buat navigasi ke Dashboard
+                  // Sekarang navigasinya sudah aktif ke RoutinePage
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RoutinePage(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.pink[100],
@@ -65,6 +71,51 @@ class WelcomeScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// Fitur Utama: Skincare Routine Tracker (Sesuai Blueprint Minggu 3)
+class RoutinePage extends StatefulWidget {
+  const RoutinePage({super.key});
+
+  @override
+  State<RoutinePage> createState() => _RoutinePageState();
+}
+
+class _RoutinePageState extends State<RoutinePage> {
+  // Daftar skincare harian Iin
+  final Map<String, bool> morningRoutine = {
+    "Facial Wash": false,
+    "Toner": false,
+    "Moisturizer": false,
+    "Sunscreen": false,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Rutinitas Pagi ☀️",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.pink[200],
+      ),
+      body: ListView(
+        children: morningRoutine.keys.map((String key) {
+          return CheckboxListTile(
+            title: Text(key),
+            value: morningRoutine[key],
+            activeColor: Colors.pink[300],
+            onChanged: (bool? value) {
+              setState(() {
+                morningRoutine[key] = value!;
+              });
+            },
+          );
+        }).toList(),
       ),
     );
   }
