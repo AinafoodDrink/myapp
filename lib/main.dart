@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'night_routine.dart'; // Menghubungkan ke file malam
 
 void main() {
   runApp(const GlowUpApp());
@@ -50,7 +51,6 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () {
-                  // Sekarang navigasinya sudah aktif ke RoutinePage
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -65,6 +65,9 @@ class WelcomeScreen extends StatelessWidget {
                     horizontal: 50,
                     vertical: 15,
                   ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                 ),
                 child: const Text("Mulai Sekarang"),
               ),
@@ -76,7 +79,7 @@ class WelcomeScreen extends StatelessWidget {
   }
 }
 
-// Fitur Utama: Skincare Routine Tracker (Sesuai Blueprint Minggu 3)
+// Halaman Rutinitas Pagi yang sudah dipercantik (Sesuai Blueprint Minggu 3)
 class RoutinePage extends StatefulWidget {
   const RoutinePage({super.key});
 
@@ -85,7 +88,7 @@ class RoutinePage extends StatefulWidget {
 }
 
 class _RoutinePageState extends State<RoutinePage> {
-  // Daftar skincare harian Iin
+  // Daftar skincare pagi Iin
   final Map<String, bool> morningRoutine = {
     "Facial Wash": false,
     "Toner": false,
@@ -99,23 +102,58 @@ class _RoutinePageState extends State<RoutinePage> {
       appBar: AppBar(
         title: const Text(
           "Rutinitas Pagi ☀️",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.pink[200],
+        elevation: 0,
+        centerTitle: true,
       ),
       body: ListView(
+        padding: const EdgeInsets.all(16.0),
         children: morningRoutine.keys.map((String key) {
-          return CheckboxListTile(
-            title: Text(key),
-            value: morningRoutine[key],
-            activeColor: Colors.pink[300],
-            onChanged: (bool? value) {
-              setState(() {
-                morningRoutine[key] = value!;
-              });
-            },
+          return Card(
+            elevation: 2,
+            margin: const EdgeInsets.only(bottom: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            color: const Color(0xFFFFF9FA), // Pink pastel sangat lembut
+            child: CheckboxListTile(
+              title: Text(
+                key,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF5A5A5A),
+                ),
+              ),
+              value: morningRoutine[key],
+              activeColor: Colors.pink[300],
+              checkColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 5,
+              ),
+              onChanged: (bool? value) {
+                setState(() {
+                  morningRoutine[key] = value!;
+                });
+              },
+            ),
           );
         }).toList(),
+      ),
+      // Tombol Navigasi ke Halaman Malam
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NightRoutinePage()),
+          );
+        },
+        label: const Text("Ke Rutinitas Malam 🌙"),
+        icon: const Icon(Icons.nightlight_round),
+        backgroundColor: Colors.indigo[300],
+        foregroundColor: Colors.white,
       ),
     );
   }
