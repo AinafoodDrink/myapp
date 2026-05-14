@@ -23,10 +23,9 @@ class _NightRoutinePageState extends State<NightRoutinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Warna sedikit lebih gelap dari yang pagi untuk kesan malam
         backgroundColor: const Color(0xFFF48FB1),
-        title: const Row(
-          children: [
+        title: Row(
+          children: const [
             Text(
               "Rutinitas Malam",
               style: TextStyle(
@@ -59,7 +58,6 @@ class _NightRoutinePageState extends State<NightRoutinePage> {
                   _nightTasks[index]['name'],
                   style: TextStyle(
                     fontSize: 16,
-                    // Efek coret jika sudah dicentang
                     decoration: _nightTasks[index]['isChecked']
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
