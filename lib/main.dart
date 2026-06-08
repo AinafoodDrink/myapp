@@ -26,7 +26,10 @@ class GlowUpApp extends StatelessWidget {
       ),
       home: const LoginBaru(),
       routes: {
-        '/dashboard': (context) => const MainDashboard(),
+        '/dashboard': (context) {
+          final birthYear = ModalRoute.of(context)?.settings.arguments as int?;
+          return MainDashboard(birthYear: birthYear ?? DateTime.now().year - 25);
+        },
       },
     );
   }
@@ -47,7 +50,9 @@ class RoutineTask {
 }
 
 class MainDashboard extends StatefulWidget {
-  const MainDashboard({super.key});
+  final int birthYear;
+
+  const MainDashboard({super.key, required this.birthYear});
 
   @override
   State<MainDashboard> createState() => _MainDashboardState();
@@ -57,74 +62,156 @@ class _MainDashboardState extends State<MainDashboard> {
   bool _hasStarted = false;
   int _currentIndex = 0;
   late List<RoutineTask> _tasks;
+  late int _age;
+  late String _routineHint;
 
   @override
   void initState() {
     super.initState();
-    // Pre-populate tasks to match the 6/10 progress (60%) from the image
-    _tasks = [
-      // Morning Routine (4 items)
-      RoutineTask(
-        title: "Gentle Cleanser",
-        subtitle: "SeraVe Hydrating Facial",
-        isMorning: true,
-        isCompleted: true,
-      ),
-      RoutineTask(
-        title: "Toner",
-        subtitle: "Anua Heartleaf 77%",
-        isMorning: true,
-        isCompleted: true,
-      ),
-      RoutineTask(
-        title: "Vitamin C Serum",
-        subtitle: "SkinCeuticals CE Ferulic",
-        isMorning: true,
-        isCompleted: false,
-      ),
-      RoutineTask(
-        title: "Sunscreen (SPF 50)",
-        subtitle: "Beauty of Joseon Relief Sun",
-        isMorning: true,
-        isCompleted: false,
-      ),
+    _age = _calculateAge(widget.birthYear);
+    _routineHint = 'Rutinitas otomatis untuk usia $_age tahun';
+    _tasks = _getRoutineTasksForAge(_age);
+  }
 
-      // Night Routine (6 items total: 4 visible in screenshot, 2 hidden)
+  int _calculateAge(int birthYear) {
+    final currentYear = DateTime.now().year;
+    final computedAge = currentYear - birthYear;
+    if (computedAge < 8) return 8;
+    if (computedAge > 90) return 90;
+    return computedAge;
+  }
+
+  List<RoutineTask> _getRoutineTasksForAge(int age) {
+    if (age < 20) {
+      return [
+        RoutineTask(
+          title: 'Gentle Cleanser',
+          subtitle: 'Pembersih lembut untuk kulit muda',
+          isMorning: true,
+          isCompleted: true,
+        ),
+        RoutineTask(
+          title: 'Moisturizer',
+          subtitle: 'Ringan dan non-komedogenik',
+          isMorning: true,
+          isCompleted: false,
+        ),
+        RoutineTask(
+          title: 'Sunscreen (SPF 50)',
+          subtitle: 'Perlindungan penting setiap hari',
+          isMorning: true,
+          isCompleted: false,
+        ),
+        RoutineTask(
+          title: 'Lip Balm',
+          subtitle: 'Mencegah bibir kering',
+          isMorning: true,
+          isCompleted: false,
+        ),
+        RoutineTask(
+          title: 'Cleansing Water',
+          subtitle: 'Bersihkan kotoran dan makeup ringan',
+          isMorning: false,
+          isCompleted: false,
+        ),
+        RoutineTask(
+          title: 'Night Cream',
+          subtitle: 'Nutrisi malam untuk kulit segar',
+          isMorning: false,
+          isCompleted: false,
+        ),
+      ];
+    }
+
+    if (age < 30) {
+      return [
+        RoutineTask(
+          title: 'Gentle Cleanser',
+          subtitle: 'Pembersih lembut yang menyeimbangkan kulit',
+          isMorning: true,
+          isCompleted: true,
+        ),
+        RoutineTask(
+          title: 'Toner',
+          subtitle: 'Menyegarkan dan melembapkan',
+          isMorning: true,
+          isCompleted: true,
+        ),
+        RoutineTask(
+          title: 'Vitamin C Serum',
+          subtitle: 'Mencerahkan dan melindungi kulit',
+          isMorning: true,
+          isCompleted: false,
+        ),
+        RoutineTask(
+          title: 'Sunscreen (SPF 50)',
+          subtitle: 'Perisai harian dari sinar UV',
+          isMorning: true,
+          isCompleted: false,
+        ),
+        RoutineTask(
+          title: 'Cleansing Balm',
+          subtitle: 'Double cleanse untuk sisa makeup',
+          isMorning: false,
+          isCompleted: true,
+        ),
+        RoutineTask(
+          title: 'Retinol Serum',
+          subtitle: 'Perawatan antioksidan ringan',
+          isMorning: false,
+          isCompleted: false,
+        ),
+        RoutineTask(
+          title: 'Moisturizer',
+          subtitle: 'Mengunci kelembapan malam hari',
+          isMorning: false,
+          isCompleted: false,
+        ),
+      ];
+    }
+
+    return [
       RoutineTask(
-        title: "Cleansing Balm",
-        subtitle: "Banila Co Clean It Zero",
+        title: 'Gentle Cleanser',
+        subtitle: 'Membersihkan tanpa mengeringkan',
+        isMorning: true,
+        isCompleted: true,
+      ),
+      RoutineTask(
+        title: 'Antioxidant Serum',
+        subtitle: 'Perkuat kulit dari radikal bebas',
+        isMorning: true,
+        isCompleted: true,
+      ),
+      RoutineTask(
+        title: 'Moisturizer',
+        subtitle: 'Kaya nutrisi dan menenangkan',
+        isMorning: true,
+        isCompleted: false,
+      ),
+      RoutineTask(
+        title: 'Sunscreen (SPF 50)',
+        subtitle: 'Wajib setiap pagi',
+        isMorning: true,
+        isCompleted: false,
+      ),
+      RoutineTask(
+        title: 'Cleansing Balm',
+        subtitle: 'Hapus debu dan polusi',
         isMorning: false,
         isCompleted: true,
       ),
       RoutineTask(
-        title: "Water-based Cleanser",
-        subtitle: "SeraVe Hydrating Facial",
-        isMorning: false,
-        isCompleted: true,
-      ),
-      RoutineTask(
-        title: "Retinol Serum",
-        subtitle: "The Ordinary Retinol 0.5%",
-        isMorning: false,
-        isCompleted: true,
-      ),
-      RoutineTask(
-        title: "Rich Moisturizer",
-        subtitle: "La Roche-Posay Cicaplast",
+        title: 'Barrier Cream',
+        subtitle: 'Perbaiki lapisan pelindung kulit',
         isMorning: false,
         isCompleted: false,
       ),
       RoutineTask(
-        title: "Eye Cream",
-        subtitle: "CeraVe Eye Repair Cream",
+        title: 'Eye Cream',
+        subtitle: 'Perawatan area mata sensitif',
         isMorning: false,
-        isCompleted: true, // completed (scrolled/hidden)
-      ),
-      RoutineTask(
-        title: "Sleeping Mask",
-        subtitle: "Laneige Water Sleeping Mask",
-        isMorning: false,
-        isCompleted: false, // unchecked (scrolled/hidden)
+        isCompleted: false,
       ),
     ];
   }
@@ -398,6 +485,14 @@ class _MainDashboardState extends State<MainDashboard> {
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: themeColor,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          _routineHint,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 13,
+            color: const Color(0xFF7C7879),
           ),
         ),
         const SizedBox(height: 16),
