@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'inventory_page.dart';
 import 'journal_page.dart';
+import 'login_baru.dart';
 
 void main() {
   runApp(const GlowUpApp());
@@ -23,7 +24,10 @@ class GlowUpApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
       ),
-      home: const MainDashboard(),
+      home: const LoginBaru(),
+      routes: {
+        '/dashboard': (context) => const MainDashboard(),
+      },
     );
   }
 }
@@ -152,8 +156,9 @@ class _MainDashboardState extends State<MainDashboard> {
       children: [
         const SizedBox(height: 16),
         // Header Row (Title, Bell, Avatar)
+        // Header Row (Title only)
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               "GlowUp Daily",
@@ -162,31 +167,6 @@ class _MainDashboardState extends State<MainDashboard> {
                 fontWeight: FontWeight.bold,
                 color: themeColor,
               ),
-            ),
-            Row(
-              children: [
-                Icon(
-                  Icons.notifications_none_rounded,
-                  color: themeColor,
-                  size: 26,
-                ),
-                const SizedBox(width: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0xFFF2E1E4),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: const CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(
-                      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
-                    ),
-                  ),
-                ),
-              ],
             ),
           ],
         ),
