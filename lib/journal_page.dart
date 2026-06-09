@@ -15,6 +15,7 @@ class JournalEntry {
   final String date;
   final String notes;
   final String imagePath;
+  final String conditionName;
   final IconData conditionIcon;
   final Color conditionColor;
 
@@ -22,6 +23,7 @@ class JournalEntry {
     required this.date,
     required this.notes,
     required this.imagePath,
+    required this.conditionName,
     required this.conditionIcon,
     required this.conditionColor,
   });
@@ -164,26 +166,26 @@ class _JournalPageState extends State<JournalPage> {
     JournalEntry(
       date: "30 April ${DateTime.now().year}",
       notes: "Kulit terasa sangat lembab...",
-      imagePath:
-          "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=150",
+      imagePath: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=150",
       conditionIcon: Icons.sentiment_satisfied_alt_rounded,
       conditionColor: const Color(0xFF8D4B60),
+      conditionName: "Lembab", // <--- Tambahkan ini
     ),
     JournalEntry(
       date: "29 April ${DateTime.now().year}",
       notes: "Sedikit kering di area T-zone",
-      imagePath:
-          "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=150",
+      imagePath: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=150",
       conditionIcon: Icons.water_drop_outlined,
       conditionColor: Colors.blue,
+      conditionName: "Kering", // <--- Tambahkan ini
     ),
     JournalEntry(
       date: "28 April ${DateTime.now().year}",
       notes: "Ada kemerahan di pipi kiri",
-      imagePath:
-          "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=150",
+      imagePath: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=150",
       conditionIcon: Icons.warning_amber_rounded,
       conditionColor: Colors.orange,
+      conditionName: "Iritasi", // <--- Tambahkan ini
     ),
   ];
 
@@ -234,6 +236,7 @@ class _JournalPageState extends State<JournalPage> {
           imagePath:
               _selectedImage?.path ??
               "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?w=150",
+          conditionName: _selectedCondition,
           conditionIcon: conditionIcon,
           conditionColor: conditionColor,
         ),
@@ -624,7 +627,11 @@ class _JournalPageState extends State<JournalPage> {
         const SizedBox(height: 12),
 
         // History items
-        ..._history.map((entry) => _buildHistoryCard(entry, themeColor)),
+        ..._history.asMap().entries.map((historyEntry) {
+          final index = historyEntry.key;
+          final entry = historyEntry.value;
+          return _buildHistoryCard(entry, themeColor, index);
+        }).toList(),
         const SizedBox(height: 24),
 
         // 6. Simpan Jurnal Button
@@ -654,56 +661,293 @@ class _JournalPageState extends State<JournalPage> {
     );
   }
 
-  Widget _buildHistoryCard(JournalEntry entry, Color themeColor) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.015),
-            blurRadius: 8,
-            offset: Offset(0, 4),
-          ),
-        ],
+  Widget _buildHistoryCard(JournalEntry entry, Color themeColor, int index) {
+    return GestureDetector(
+      onTap: () => _openJournalDetail(entry, index),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.015),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: _buildEntryImage(entry.imagePath),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.date,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      color: const Color(0xFF7C7879),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    entry.notes,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: const Color(0xFF1E1B1C),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(entry.conditionIcon, color: entry.conditionColor, size: 20),
+          ],
+        ),
       ),
-      child: Row(
+    );
+  }
+
+  Future<void> _openJournalDetail(JournalEntry entry, int index) async {
+    final updatedEntry = await Navigator.push<JournalEntry>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => JournalDetailPage(entry: entry),
+      ),
+    );
+
+    if (updatedEntry != null) {
+      setState(() {
+        _history[index] = updatedEntry;
+      });
+    }
+  }
+}
+
+class JournalDetailPage extends StatefulWidget {
+  final JournalEntry entry;
+
+  const JournalDetailPage({super.key, required this.entry});
+
+  @override
+  State<JournalDetailPage> createState() => _JournalDetailPageState();
+}
+
+class _JournalDetailPageState extends State<JournalDetailPage> {
+  late TextEditingController _detailNotesController;
+  late String _selectedCondition;
+
+  final List<Map<String, dynamic>> _conditions = [
+    {'name': 'Happy', 'icon': Icons.sentiment_satisfied_alt_rounded},
+    {'name': 'Acne', 'icon': Icons.volcano_outlined},
+    {'name': 'Dry', 'icon': Icons.water_drop_outlined},
+    {'name': 'Sensitive', 'icon': Icons.warning_amber_rounded},
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _detailNotesController = TextEditingController(text: widget.entry.notes);
+    _selectedCondition = widget.entry.conditionName;
+  }
+
+  @override
+  void dispose() {
+    _detailNotesController.dispose();
+    super.dispose();
+  }
+
+  IconData get _selectedConditionIcon {
+    return _conditions.firstWhere(
+      (cond) => cond['name'] == _selectedCondition,
+      orElse: () => _conditions.first,
+    )['icon'] as IconData;
+  }
+
+  Color get _selectedConditionColor {
+    switch (_selectedCondition) {
+      case 'Dry':
+        return Colors.blue;
+      case 'Sensitive':
+        return Colors.orange;
+      case 'Acne':
+        return Colors.red;
+      default:
+        return const Color(0xFF8D4B60);
+    }
+  }
+
+  void _saveDetail() {
+    if (_detailNotesController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Catatan tidak boleh kosong')), 
+      );
+      return;
+    }
+
+    final updatedEntry = JournalEntry(
+      date: widget.entry.date,
+      notes: _detailNotesController.text,
+      imagePath: widget.entry.imagePath,
+      conditionName: _selectedCondition,
+      conditionIcon: _selectedConditionIcon,
+      conditionColor: _selectedConditionColor,
+    );
+
+    Navigator.pop(context, updatedEntry);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeColor = const Color(0xFF8D4B60);
+    final imageWidget = widget.entry.imagePath.contains('/') && !widget.entry.imagePath.contains('http')
+        ? Image.file(
+            File(widget.entry.imagePath),
+            width: double.infinity,
+            height: 220,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(),
+          )
+        : Image.network(
+            widget.entry.imagePath,
+            width: double.infinity,
+            height: 220,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(),
+          );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detail Jurnal', style: GoogleFonts.lora()),
+        backgroundColor: themeColor,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: _buildEntryImage(entry.imagePath),
+            borderRadius: BorderRadius.circular(16),
+            child: imageWidget,
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  entry.date,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11,
-                    color: const Color(0xFF7C7879),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  entry.notes,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: const Color(0xFF1E1B1C),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+          const SizedBox(height: 20),
+          Text(
+            widget.entry.date,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              color: const Color(0xFF7C7879),
             ),
           ),
-          Icon(entry.conditionIcon, color: entry.conditionColor, size: 20),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: themeColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Icon(_selectedConditionIcon, color: _selectedConditionColor, size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      _selectedCondition,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w600,
+                        color: _selectedConditionColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Ubah Kondisi Kulit',
+            style: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _conditions.map((cond) {
+              final isSelected = cond['name'] == _selectedCondition;
+              return ChoiceChip(
+                label: Text(cond['name'], style: GoogleFonts.plusJakartaSans()),
+                selected: isSelected,
+                selectedColor: themeColor.withOpacity(0.2),
+                onSelected: (_) {
+                  setState(() {
+                    _selectedCondition = cond['name'] as String;
+                  });
+                },
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Catatan Jurnal',
+            style: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _detailNotesController,
+            maxLines: 6,
+            style: GoogleFonts.plusJakartaSans(fontSize: 13),
+            decoration: InputDecoration(
+              hintText: 'Tuliskan perubahan dan kondisi kulit kamu...',
+              contentPadding: const EdgeInsets.all(14),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFF5D1DB)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: _saveDetail,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: themeColor,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: Text(
+              'Simpan Perubahan',
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildImagePlaceholder() {
+    return Container(
+      width: double.infinity,
+      height: 220,
+      color: const Color(0xFFF5D1DB),
+      alignment: Alignment.center,
+      child: const Icon(Icons.broken_image, size: 60, color: Colors.white54),
     );
   }
 }
