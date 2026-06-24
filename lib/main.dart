@@ -68,7 +68,8 @@ class _MainDashboardState extends State<MainDashboard> {
   @override
   void initState() {
     super.initState();
-    _age = _calculateAge(widget.birthYear);
+
+    _age = 17;
     _routineHint = 'Rutinitas otomatis untuk usia $_age tahun';
     _tasks = _getRoutineTasksForAge(_age);
   }
