@@ -81,7 +81,6 @@ class _MainDashboardState extends State<MainDashboard> {
     if (computedAge > 90) return 90;
     return computedAge;
   }
-
   List<RoutineTask> _getRoutineTasksForAge(int age) {
     if (age < 20) {
       return [
